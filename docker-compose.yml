@@ -1,0 +1,33 @@
+#http
+services:
+  postgres:
+    image: postgres:13
+    env: &env
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
+      SECRET_KEY: ${SECRET_KEY}
+      PORT: 8000
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    restart: unless-stopped
+
+  redis:
+    image: redis
+    restart: unless-stopped
+
+  app:
+    container_name: glitchtip-django-app
+    image: glitchtip/glitchtip
+    depends_on: &default-depends_on
+      - postgres
+      - redis
+    ports:
+      - "8003:8000"
+    env: *env
+    restart: unless-stopped
+
+  worker:
+    container_name: glitchtip-celery-worker
+    image: glitchtip/glitchtip
+    command: ./bin/run-celery-with-beat.sh
+    depends_on: *default-depends_on
+    env: *env
+    restart: unless-stopped
