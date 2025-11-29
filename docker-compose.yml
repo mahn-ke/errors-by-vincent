@@ -2,7 +2,7 @@
 services:
   postgres:
     image: postgres:13
-    env: &env
+    environment: &env
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
       SECRET_KEY: ${SECRET_KEY}
       PORT: 8000
@@ -21,7 +21,7 @@ services:
       - redis
     ports:
       - "8003:8000"
-    env: *env
+    environment: *env
     restart: unless-stopped
 
   worker:
@@ -29,5 +29,5 @@ services:
     image: glitchtip/glitchtip
     command: ./bin/run-celery-with-beat.sh
     depends_on: *default-depends_on
-    env: *env
+    environment: *env
     restart: unless-stopped
