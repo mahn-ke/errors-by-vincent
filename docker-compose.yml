@@ -1,33 +1,52 @@
 #http
+x-environment: &default-environment
+  DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
+  VALKEY_URL: redis://valkey:6379
+  SECRET_KEY: ${SECRET_KEY}
+  PORT: 8000
+  EMAIL_URL: smtp://${SMTP_USERNAME}:${SMTP_PASSWORD}@${SMTP_HOST}:${SMTP_PORT}
+  GLITCHTIP_DOMAIN: https://errors.by.vincent.mahn.ke
+  DEFAULT_FROM_EMAIL: glitchtip.by.vincent@mahn.ke
+  CELERY_WORKER_AUTOSCALE: "1,3"
+
+x-depends_on: &default-depends_on
+  - postgres
+  - valkey
+
 services:
   postgres:
-    image: postgres:13
-    environment: &env
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
-      SECRET_KEY: ${SECRET_KEY}
-      PORT: 8000
+    image: postgres:18
+    environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
     restart: unless-stopped
-
-  redis:
-    image: redis
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+  valkey:
+    image: valkey/valkey
     restart: unless-stopped
-
-  app:
-    container_name: glitchtip-django-app
+  web:
     image: glitchtip/glitchtip
-    depends_on: &default-depends_on
-      - postgres
-      - redis
+    depends_on: *default-depends_on
     ports:
       - "8003:8000"
-    environment: *env
+    environment: *default-environment
     restart: unless-stopped
-
+    volumes:
+      - uploads:/code/uploads
   worker:
-    container_name: glitchtip-celery-worker
     image: glitchtip/glitchtip
     command: ./bin/run-celery-with-beat.sh
     depends_on: *default-depends_on
-    environment: *env
+    environment: *default-environment
     restart: unless-stopped
+    volumes:
+      - uploads:/code/uploads
+  migrate:
+    image: glitchtip/glitchtip
+    depends_on: *default-depends_on
+    command: ./bin/run-migrate.sh
+    environment: *default-environment
+
+volumes:
+  pg-data:
+  uploads:
