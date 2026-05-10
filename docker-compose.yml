@@ -16,7 +16,7 @@ x-depends_on: &default-depends_on
 
 services:
   postgres:
-    image: postgres:17
+    image: postgres:18
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
     restart: unless-stopped
