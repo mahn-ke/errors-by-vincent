@@ -26,7 +26,7 @@ services:
     image: valkey/valkey:latest@sha256:8436e10bc65c94886a91d4415b6a6dfa9cb5a306fb3b996e5bb67cd2b4854193
     restart: unless-stopped
   web:
-    image: glitchtip/glitchtip:latest@sha256:f45485d296697531464b4484ee9bb40a51a774df820f74128a2b2ae0c5a0b00f
+    image: glitchtip/glitchtip:latest@sha256:a3d8eb1b36c1e1603d55ab32711ea3dd8115874742a781a57391a62a16e0dff6
     depends_on: *default-depends_on
     ports:
       - "8003:8000"
@@ -35,7 +35,7 @@ services:
     volumes:
       - uploads:/code/uploads
   worker:
-    image: glitchtip/glitchtip:latest@sha256:f45485d296697531464b4484ee9bb40a51a774df820f74128a2b2ae0c5a0b00f
+    image: glitchtip/glitchtip:latest@sha256:a3d8eb1b36c1e1603d55ab32711ea3dd8115874742a781a57391a62a16e0dff6
     command: ./bin/run-celery-with-beat.sh
     depends_on: *default-depends_on
     environment: *default-environment
@@ -43,7 +43,7 @@ services:
     volumes:
       - uploads:/code/uploads
   migrate:
-    image: glitchtip/glitchtip:latest@sha256:f45485d296697531464b4484ee9bb40a51a774df820f74128a2b2ae0c5a0b00f
+    image: glitchtip/glitchtip:latest@sha256:a3d8eb1b36c1e1603d55ab32711ea3dd8115874742a781a57391a62a16e0dff6
     depends_on: *default-depends_on
     command: ./bin/run-migrate.sh
     environment: *default-environment
